@@ -1,13 +1,31 @@
-
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Sparkles, Target, Clock, CheckCircle, Loader2 } from 'lucide-react';
-import type { CreateTodoInput, Todo } from '@/types/todo';
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Plus,
+  Sparkles,
+  Target,
+  Clock,
+  CheckCircle,
+  Loader2,
+} from "lucide-react";
+import type { CreateTodoInput, Todo } from "@/types/todo";
 
 interface AddTodoDialogProps {
   onAdd: (input: CreateTodoInput) => Promise<void>;
@@ -21,18 +39,18 @@ const statusIcons = {
 };
 
 const statusColors = {
-  pending: 'text-yellow-600 bg-yellow-50 border-yellow-200',
-  in_progress: 'text-blue-600 bg-blue-50 border-blue-200',
-  completed: 'text-green-600 bg-green-50 border-green-200',
+  pending: "text-yellow-600 bg-yellow-50 border-yellow-200",
+  in_progress: "text-blue-600 bg-blue-50 border-blue-200",
+  completed: "text-green-600 bg-green-50 border-green-200",
 };
 
 export function AddTodoDialog({ onAdd, trigger }: AddTodoDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<CreateTodoInput>({
-    title: '',
-    description: '',
-    status: 'pending',
+    title: "",
+    description: "",
+    status: "pending",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,10 +60,10 @@ export function AddTodoDialog({ onAdd, trigger }: AddTodoDialogProps) {
     setIsLoading(true);
     try {
       await onAdd(formData);
-      setFormData({ title: '', description: '', status: 'pending' });
+      setFormData({ title: "", description: "", status: "pending" });
       setIsOpen(false);
     } catch (error) {
-      console.error('Failed to add todo:', error);
+      console.error("Failed to add todo:", error);
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +71,7 @@ export function AddTodoDialog({ onAdd, trigger }: AddTodoDialogProps) {
 
   const handleClose = () => {
     setIsOpen(false);
-    setFormData({ title: '', description: '', status: 'pending' });
+    setFormData({ title: "", description: "", status: "pending" });
   };
 
   const StatusIcon = statusIcons[formData.status];
@@ -62,7 +80,7 @@ export function AddTodoDialog({ onAdd, trigger }: AddTodoDialogProps) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button className="relative bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 group">
+          <Button className="relative bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-md blur opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
             <Plus className="w-4 h-4 relative z-10" />
             <span className="relative z-10">Add Todo</span>
@@ -82,22 +100,29 @@ export function AddTodoDialog({ onAdd, trigger }: AddTodoDialogProps) {
                 <DialogTitle className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   Create New Todo
                 </DialogTitle>
-                <p className="text-sm text-gray-500 mt-1">Add a new task to your productivity journey</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Add a new task to your productivity journey
+                </p>
               </div>
             </div>
           </DialogHeader>
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title Field */}
             <div className="space-y-2">
-              <Label htmlFor="title" className="text-sm font-semibold text-gray-700 flex items-center space-x-2">
+              <Label
+                htmlFor="title"
+                className="text-sm font-semibold text-gray-700 flex items-center space-x-2"
+              >
                 <Target className="w-4 h-4" />
                 <span>Title</span>
               </Label>
               <Input
                 id="title"
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
                 placeholder="What needs to be done?"
                 required
                 className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 transition-colors duration-200 bg-white/80 backdrop-blur-sm"
@@ -106,14 +131,19 @@ export function AddTodoDialog({ onAdd, trigger }: AddTodoDialogProps) {
 
             {/* Description Field */}
             <div className="space-y-2">
-              <Label htmlFor="description" className="text-sm font-semibold text-gray-700 flex items-center space-x-2">
+              <Label
+                htmlFor="description"
+                className="text-sm font-semibold text-gray-700 flex items-center space-x-2"
+              >
                 <Sparkles className="w-4 h-4" />
                 <span>Description</span>
               </Label>
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 placeholder="Add more details about this task..."
                 rows={3}
                 className="border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500 transition-colors duration-200 bg-white/80 backdrop-blur-sm resize-none"
@@ -122,11 +152,19 @@ export function AddTodoDialog({ onAdd, trigger }: AddTodoDialogProps) {
 
             {/* Status Field */}
             <div className="space-y-2">
-              <Label htmlFor="status" className="text-sm font-semibold text-gray-700 flex items-center space-x-2">
+              <Label
+                htmlFor="status"
+                className="text-sm font-semibold text-gray-700 flex items-center space-x-2"
+              >
                 <StatusIcon className="w-4 h-4" />
                 <span>Status</span>
               </Label>
-              <Select value={formData.status} onValueChange={(value: Todo['status']) => setFormData({ ...formData, status: value })}>
+              <Select
+                value={formData.status}
+                onValueChange={(value: Todo["status"]) =>
+                  setFormData({ ...formData, status: value })
+                }
+              >
                 <SelectTrigger className="border-2 border-gray-200 focus:border-blue-500 bg-white/80 backdrop-blur-sm">
                   <SelectValue />
                 </SelectTrigger>
@@ -156,40 +194,47 @@ export function AddTodoDialog({ onAdd, trigger }: AddTodoDialogProps) {
             {/* Status Preview */}
             <div className="p-3 rounded-lg border-2 border-dashed border-gray-200 bg-white/50">
               <div className="flex items-center space-x-2">
-                <StatusIcon className={`w-4 h-4 ${statusColors[formData.status].split(' ')[0]}`} />
+                <StatusIcon
+                  className={`w-4 h-4 ${
+                    statusColors[formData.status].split(" ")[0]
+                  }`}
+                />
                 <span className="text-sm font-medium text-gray-600">
-                  This todo will be created as: <span className="font-semibold">{formData.status.replace('_', ' ')}</span>
+                  This todo will be created as:{" "}
+                  <span className="font-semibold">
+                    {formData.status.replace("_", " ")}
+                  </span>
                 </span>
               </div>
             </div>
 
             {/* Action Buttons */}
             <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={handleClose}
                 className="border-2 hover:bg-gray-50 transition-colors duration-200"
               >
                 Cancel
               </Button>
               <Button 
-                type="submit" 
-                disabled={isLoading || !formData.title.trim()}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]"
-              >
-                {isLoading ? (
-                  <div className="flex items-center space-x-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Adding...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-2">
-                    <Plus className="w-4 h-4" />
-                    <span>Add Todo</span>
-                  </div>
-                )}
-              </Button>
+                  type="submit" 
+                  disabled={isLoading || !formData.title.trim()}
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center space-x-2">
+                      <Loader2 className="w-4 h-4" />
+                      <span>Adding...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <Plus className="w-4 h-4" />
+                      <span>Add Todo</span>
+                    </div>
+                  )}
+                </Button>
             </div>
           </form>
         </div>

@@ -29,7 +29,9 @@ export default defineConfig(async () => ({
   build: {
     rollupOptions: {
       input: {
-        main: './index.html'
+        main: './index.html',
+        timer: './timer.html',
+        about: './about.html',
       }
     }
   },

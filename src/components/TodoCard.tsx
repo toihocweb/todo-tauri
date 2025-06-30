@@ -94,6 +94,7 @@ const statusIcons = {
   completed: CheckCircle,
 };
 
+const TIME = 45;
 export function TodoCard({ todo, onUpdate, onDelete }: TodoCardProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -149,11 +150,11 @@ export function TodoCard({ todo, onUpdate, onDelete }: TodoCardProps) {
       await invoke("start_timer", {
         todoTitle: todo.title,
         todoId: todo.id,
-        durationMinutes: 25,
+        durationMinutes: TIME,
       });
 
       toast.success("Timer Started!", {
-        description: `25-minute focus session for: ${todo.title}`,
+        description: `${TIME}-minute focus session for: ${todo.title}`,
         duration: 3000,
       });
     } catch (error) {
@@ -365,7 +366,7 @@ export function TodoCard({ todo, onUpdate, onDelete }: TodoCardProps) {
                 <Button
                   onClick={handleUpdate}
                   disabled={isLoading || !editData.title.trim()}
-                  className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]"
                 >
                   {isLoading ? (
                     <div className="flex items-center space-x-2">
@@ -430,7 +431,7 @@ export function TodoCard({ todo, onUpdate, onDelete }: TodoCardProps) {
               <AlertDialogAction
                 onClick={handleDelete}
                 disabled={deleteLoading}
-                className="bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
+                className="bg-gradient-to-r from-red-500 to-orange-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
               >
                 {deleteLoading ? (
                   <div className="flex items-center space-x-2">

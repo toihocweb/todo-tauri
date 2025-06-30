@@ -113,7 +113,7 @@ export default function TimerApp() {
         </div>
         
         {/* Timer display - absolutely centered */}
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center top-5">
           <div className={`text-2xl font-mono font-bold ${getTimeColor()} drop-shadow-lg leading-none`}>
             {formatTime(timerState.remaining_seconds)}
           </div>

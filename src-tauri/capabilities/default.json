@@ -19,6 +19,9 @@
     "notification:allow-request-permission",
     "notification:allow-show",
     "notification:allow-check-permissions",
-    "notification:allow-batch"
+    "notification:allow-batch",
+    "shell:allow-open",
+    "core:tray:default",
+    "core:menu:default"
   ]
 }

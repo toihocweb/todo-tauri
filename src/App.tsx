@@ -15,6 +15,9 @@ import { AddTodoDialog } from "@/components/AddTodoDialog";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import type { Todo, CreateTodoInput, UpdateTodoInput } from "@/types/todo";
 import "./app.css";
+import SettingsModal from "./components/SettingsModal";
+import { listen } from '@tauri-apps/api/event';
+import UpdateChecker from "./components/UpdateChecker";
 
 function App() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
@@ -27,6 +30,31 @@ function App() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [todosLoading, setTodosLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
+
+  useEffect(() => {
+    const unlistenCut = listen('menu-cut', () => {
+      document.execCommand('cut');
+    });
+    
+    const unlistenCopy = listen('menu-copy', () => {
+      document.execCommand('copy');
+    });
+    
+    const unlistenPaste = listen('menu-paste', () => {
+      document.execCommand('paste');
+    });
+
+    const unlistenSelectAll = listen('menu-select-all', () => {
+      document.execCommand('selectAll');
+  });
+  
+    return () => {
+      unlistenCut.then(fn => fn());
+      unlistenCopy.then(fn => fn());
+      unlistenPaste.then(fn => fn());
+      unlistenSelectAll.then(fn => fn());
+    };
+  }, []);
 
   useEffect(() => {
     // Check if user is logged in
@@ -471,7 +499,7 @@ function App() {
           </Card>
         </div>
       </div>
-      
+      <UpdateChecker />
       <style>{`
         @keyframes gradient-border {
           0% { background-position: 0% 50%; }
