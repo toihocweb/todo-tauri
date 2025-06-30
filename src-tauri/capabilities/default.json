@@ -22,6 +22,8 @@
     "notification:allow-batch",
     "shell:allow-open",
     "core:tray:default",
-    "core:menu:default"
+    "core:menu:default",
+    "updater:default",
+    "process:default"
   ]
 }

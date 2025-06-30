@@ -1,13 +1,27 @@
 
 import { useState, useEffect } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { CheckSquare, Settings, User, Lock, LogOut, Loader2, Plus, ListTodo, Clock, CheckCircle, TrendingUp, Target, Zap } from "lucide-react";
+import {
+  CheckSquare,
+  Lock,
+  LogOut,
+  Loader2,
+  ListTodo,
+  Clock,
+  CheckCircle,
+  Zap,
+} from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { TodoService } from "@/lib/todoService";
 import { TodoCard } from "@/components/TodoCard";
@@ -15,8 +29,7 @@ import { AddTodoDialog } from "@/components/AddTodoDialog";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import type { Todo, CreateTodoInput, UpdateTodoInput } from "@/types/todo";
 import "./app.css";
-import SettingsModal from "./components/SettingsModal";
-import { listen } from '@tauri-apps/api/event';
+import { listen } from "@tauri-apps/api/event";
 import UpdateChecker from "./components/UpdateChecker";
 
 function App() {
@@ -25,34 +38,45 @@ function App() {
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
-  
+  const [showUpdateChecker, setShowUpdateChecker] = useState(false);
+
   // Todo states
   const [todos, setTodos] = useState<Todo[]>([]);
   const [todosLoading, setTodosLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
 
   useEffect(() => {
-    const unlistenCut = listen('menu-cut', () => {
-      document.execCommand('cut');
-    });
-    
-    const unlistenCopy = listen('menu-copy', () => {
-      document.execCommand('copy');
-    });
-    
-    const unlistenPaste = listen('menu-paste', () => {
-      document.execCommand('paste');
+    const unlistenCut = listen("menu-cut", () => {
+      document.execCommand("cut");
     });
 
-    const unlistenSelectAll = listen('menu-select-all', () => {
-      document.execCommand('selectAll');
-  });
-  
+    const unlistenCopy = listen("menu-copy", () => {
+      document.execCommand("copy");
+    });
+
+    const unlistenPaste = listen("menu-paste", () => {
+      document.execCommand("paste");
+    });
+
+    const unlistenSelectAll = listen("menu-select-all", () => {
+      document.execCommand("selectAll");
+    });
+
     return () => {
-      unlistenCut.then(fn => fn());
-      unlistenCopy.then(fn => fn());
-      unlistenPaste.then(fn => fn());
-      unlistenSelectAll.then(fn => fn());
+      unlistenCut.then((fn) => fn());
+      unlistenCopy.then((fn) => fn());
+      unlistenPaste.then((fn) => fn());
+      unlistenSelectAll.then((fn) => fn());
+    };
+  }, []);
+
+  useEffect(() => {
+    const unlistenUpdate = listen("check-for-updates", (event) => {
+      setShowUpdateChecker(true);
+    });
+
+    return () => {
+      unlistenUpdate.then((fn) => fn());
     };
   }, []);
 
@@ -64,19 +88,19 @@ function App() {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user ?? null);
-        setLoading(false);
-        
-        if (event === 'SIGNED_OUT') {
-          toast.info("Signed out", {
-            description: "You have been signed out successfully",
-          });
-          setTodos([]);
-        }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+
+      if (event === "SIGNED_OUT") {
+        toast.info("Signed out", {
+          description: "You have been signed out successfully",
+        });
+        setTodos([]);
       }
-    );
+    });
 
     return () => subscription.unsubscribe();
   }, []);
@@ -118,7 +142,7 @@ function App() {
   const handleUpdateTodo = async (id: string, input: UpdateTodoInput) => {
     try {
       const updatedTodo = await TodoService.updateTodo(id, input);
-      setTodos(todos.map(todo => todo.id === id ? updatedTodo : todo));
+      setTodos(todos.map((todo) => (todo.id === id ? updatedTodo : todo)));
       toast.success("Todo updated successfully!");
     } catch (error: any) {
       toast.error("Failed to update todo", {
@@ -131,7 +155,7 @@ function App() {
   const handleDeleteTodo = async (id: string) => {
     try {
       await TodoService.deleteTodo(id);
-      setTodos(todos.filter(todo => todo.id !== id));
+      setTodos(todos.filter((todo) => todo.id !== id));
       toast.success("Todo deleted successfully!");
     } catch (error: any) {
       toast.error("Failed to delete todo", {
@@ -188,7 +212,8 @@ function App() {
         });
       } else {
         toast.success("Check Your Email", {
-          description: "We sent you a confirmation link to complete your registration",
+          description:
+            "We sent you a confirmation link to complete your registration",
         });
       }
     } catch (error) {
@@ -209,12 +234,12 @@ function App() {
   // Filter todos based on active tab
   const getFilteredTodos = () => {
     switch (activeTab) {
-      case 'pending':
-        return todos.filter(todo => todo.status === 'pending');
-      case 'in_progress':
-        return todos.filter(todo => todo.status === 'in_progress');
-      case 'completed':
-        return todos.filter(todo => todo.status === 'completed');
+      case "pending":
+        return todos.filter((todo) => todo.status === "pending");
+      case "in_progress":
+        return todos.filter((todo) => todo.status === "in_progress");
+      case "completed":
+        return todos.filter((todo) => todo.status === "completed");
       default:
         return todos;
     }
@@ -223,9 +248,9 @@ function App() {
   const getStatusCounts = () => {
     return {
       all: todos.length,
-      pending: todos.filter(t => t.status === 'pending').length,
-      in_progress: todos.filter(t => t.status === 'in_progress').length,
-      completed: todos.filter(t => t.status === 'completed').length,
+      pending: todos.filter((t) => t.status === "pending").length,
+      in_progress: todos.filter((t) => t.status === "in_progress").length,
+      completed: todos.filter((t) => t.status === "completed").length,
     };
   };
 
@@ -265,7 +290,9 @@ function App() {
                   type="email"
                   placeholder="Enter email"
                   value={loginData.email}
-                  onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                  onChange={(e) =>
+                    setLoginData({ ...loginData, email: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -276,7 +303,9 @@ function App() {
                   type="password"
                   placeholder="Enter password"
                   value={loginData.password}
-                  onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                  onChange={(e) =>
+                    setLoginData({ ...loginData, password: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -284,13 +313,21 @@ function App() {
                 <p className="text-sm text-red-500">{loginError}</p>
               )}
               <div className="space-y-2">
-                <Button type="submit" className="w-full" disabled={loginLoading}>
-                  {loginLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sign In"}
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loginLoading}
+                >
+                  {loginLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    "Sign In"
+                  )}
                 </Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  className="w-full" 
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
                   onClick={handleSignUp}
                   disabled={loginLoading}
                 >
@@ -328,7 +365,11 @@ function App() {
             <span className="text-sm text-gray-600 dark:text-gray-300">
               Welcome, {user.email}
             </span>
-            <Button variant="outline" onClick={handleLogout} className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              onClick={handleLogout}
+              className="flex items-center space-x-2"
+            >
               <LogOut className="w-4 h-4" />
               <span>Logout</span>
             </Button>
@@ -344,7 +385,9 @@ function App() {
             <CardContent className="pt-6 relative z-10">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 text-sm font-medium">Total Tasks</p>
+                  <p className="text-blue-100 text-sm font-medium">
+                    Total Tasks
+                  </p>
                   <p className="text-3xl font-bold mt-1">{statusCounts.all}</p>
                   <p className="text-blue-100 text-xs mt-1">All your todos</p>
                 </div>
@@ -354,7 +397,7 @@ function App() {
               </div>
             </CardContent>
           </Card>
-          
+
           {/* Pending Tasks Card */}
           <Card className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-500 text-white border-0 shadow-lg">
             <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full"></div>
@@ -363,8 +406,12 @@ function App() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-amber-100 text-sm font-medium">Pending</p>
-                  <p className="text-3xl font-bold mt-1">{statusCounts.pending}</p>
-                  <p className="text-amber-100 text-xs mt-1">Waiting to start</p>
+                  <p className="text-3xl font-bold mt-1">
+                    {statusCounts.pending}
+                  </p>
+                  <p className="text-amber-100 text-xs mt-1">
+                    Waiting to start
+                  </p>
                 </div>
                 <div className="p-3 bg-white/20 rounded-lg">
                   <Clock className="w-8 h-8" />
@@ -372,7 +419,7 @@ function App() {
               </div>
             </CardContent>
           </Card>
-          
+
           {/* In Progress Card */}
           <Card className="relative overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600 text-white border-0 shadow-lg">
             <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full"></div>
@@ -380,9 +427,15 @@ function App() {
             <CardContent className="pt-6 relative z-10">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-indigo-100 text-sm font-medium">In Progress</p>
-                  <p className="text-3xl font-bold mt-1">{statusCounts.in_progress}</p>
-                  <p className="text-indigo-100 text-xs mt-1">Currently working</p>
+                  <p className="text-indigo-100 text-sm font-medium">
+                    In Progress
+                  </p>
+                  <p className="text-3xl font-bold mt-1">
+                    {statusCounts.in_progress}
+                  </p>
+                  <p className="text-indigo-100 text-xs mt-1">
+                    Currently working
+                  </p>
                 </div>
                 <div className="p-3 bg-white/20 rounded-lg">
                   <Zap className="w-8 h-8" />
@@ -390,7 +443,7 @@ function App() {
               </div>
             </CardContent>
           </Card>
-          
+
           {/* Completed Card with Progress */}
           <Card className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-green-600 text-white border-0 shadow-lg">
             <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full"></div>
@@ -398,13 +451,19 @@ function App() {
             <CardContent className="pt-6 relative z-10">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <p className="text-emerald-100 text-sm font-medium">Completed</p>
+                  <p className="text-emerald-100 text-sm font-medium">
+                    Completed
+                  </p>
                   <div className="flex items-baseline space-x-2 mt-1">
-                    <p className="text-3xl font-bold">{statusCounts.completed}</p>
-                    <p className="text-emerald-200 text-lg font-semibold">{completionPercentage}%</p>
+                    <p className="text-3xl font-bold">
+                      {statusCounts.completed}
+                    </p>
+                    <p className="text-emerald-200 text-lg font-semibold">
+                      {completionPercentage}%
+                    </p>
                   </div>
                   <div className="mt-2 bg-white/20 rounded-full h-1.5">
-                    <div 
+                    <div
                       className="bg-white rounded-full h-1.5 transition-all duration-500 ease-out"
                       style={{ width: `${completionPercentage}%` }}
                     ></div>
@@ -426,7 +485,7 @@ function App() {
               <div className="w-full h-full bg-white dark:bg-gray-900 rounded-xl"></div>
             </div>
           </div>
-          
+
           {/* Content */}
           <Card className="relative z-10 bg-transparent border-0 shadow-none">
             <CardHeader>
@@ -443,24 +502,36 @@ function App() {
             <CardContent>
               <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="all" className="flex items-center space-x-2">
+                  <TabsTrigger
+                    value="all"
+                    className="flex items-center space-x-2"
+                  >
                     <ListTodo className="w-4 h-4" />
                     <span>All ({statusCounts.all})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="pending" className="flex items-center space-x-2">
+                  <TabsTrigger
+                    value="pending"
+                    className="flex items-center space-x-2"
+                  >
                     <Clock className="w-4 h-4" />
                     <span>Pending ({statusCounts.pending})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="in_progress" className="flex items-center space-x-2">
+                  <TabsTrigger
+                    value="in_progress"
+                    className="flex items-center space-x-2"
+                  >
                     <Zap className="w-4 h-4" />
                     <span>In Progress ({statusCounts.in_progress})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="completed" className="flex items-center space-x-2">
+                  <TabsTrigger
+                    value="completed"
+                    className="flex items-center space-x-2"
+                  >
                     <CheckCircle className="w-4 h-4" />
                     <span>Completed ({statusCounts.completed})</span>
                   </TabsTrigger>
                 </TabsList>
-                
+
                 <div className="mt-6">
                   {todosLoading ? (
                     <div className="flex justify-center py-8">
@@ -472,13 +543,17 @@ function App() {
                         <ListTodo className="w-10 h-10 text-gray-400" />
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                        {activeTab === 'all' ? 'No todos yet' : `No ${activeTab.replace('_', ' ')} todos`}
+                        {activeTab === "all"
+                          ? "No todos yet"
+                          : `No ${activeTab.replace("_", " ")} todos`}
                       </h3>
                       <p className="text-gray-500 mb-6">
-                        {activeTab === 'all' 
-                          ? 'Create your first todo to get started organizing your tasks!' 
-                          : `No tasks are currently ${activeTab.replace('_', ' ')}.`
-                        }
+                        {activeTab === "all"
+                          ? "Create your first todo to get started organizing your tasks!"
+                          : `No tasks are currently ${activeTab.replace(
+                              "_",
+                              " "
+                            )}.`}
                       </p>
                     </div>
                   ) : (
@@ -499,7 +574,10 @@ function App() {
           </Card>
         </div>
       </div>
-      <UpdateChecker />
+      <UpdateChecker
+        isOpen={showUpdateChecker}
+        onClose={() => setShowUpdateChecker(false)}
+      />
       <style>{`
         @keyframes gradient-border {
           0% { background-position: 0% 50%; }

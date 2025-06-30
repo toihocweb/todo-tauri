@@ -23,6 +23,7 @@ pub fn run() {
         .setup(setup_menu_and_tray)
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .on_window_event(|window, event| {
             use tauri::WindowEvent;
             match event {
@@ -56,10 +57,10 @@ pub fn run() {
                     }
                 },
                 "check_updates" => {
-                    let app_clone = app.clone();
-                    tauri::async_runtime::spawn(async move {
-                        let _ = crate::commands::check_for_updates(app_clone).await;
-                    });
+                    // Emit event to frontend
+                    if let Some(window) = app.get_webview_window("main") {
+                        let _ = window.emit("check-for-updates", ());
+                    }
                 }
                 "select_all" => {
                     if let Some(window) = app.get_webview_window("main") {
@@ -99,7 +100,7 @@ pub fn run() {
             show_about_dialog,
             check_for_updates,
             download_and_install_update,
-            get_current_version
+            get_current_version,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
