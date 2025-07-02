@@ -52,6 +52,7 @@ export function AddTodoDialog({ onAdd, trigger }: AddTodoDialogProps) {
     description: "",
     status: "pending",
   });
+  const [text, setText] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -218,23 +219,23 @@ export function AddTodoDialog({ onAdd, trigger }: AddTodoDialogProps) {
               >
                 Cancel
               </Button>
-              <Button 
-                  type="submit" 
-                  disabled={isLoading || !formData.title.trim()}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center space-x-2">
-                      <Loader2 className="w-4 h-4" />
-                      <span>Adding...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center space-x-2">
-                      <Plus className="w-4 h-4" />
-                      <span>Add Todo</span>
-                    </div>
-                  )}
-                </Button>
+              <Button
+                type="submit"
+                disabled={isLoading || !formData.title.trim()}
+                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]"
+              >
+                {isLoading ? (
+                  <div className="flex items-center space-x-2">
+                    <Loader2 className="w-4 h-4" />
+                    <span>Adding...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <Plus className="w-4 h-4" />
+                    <span>Add Todo</span>
+                  </div>
+                )}
+              </Button>
             </div>
           </form>
         </div>

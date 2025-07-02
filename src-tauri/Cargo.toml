@@ -1,6 +1,6 @@
 [package]
 name = "todo-app"
-version = "1.0.9"
+version = "1.2.5"
 description = "Todo App"
 authors = ["Nhat Bui"]
 edition = "2021"
@@ -21,7 +21,8 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2.0", features = [
     "tray-icon",
     "image-ico", 
-    "image-png"
+    "image-png",
+    "devtools",
 ] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }

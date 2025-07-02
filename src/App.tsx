@@ -31,6 +31,24 @@ import type { Todo, CreateTodoInput, UpdateTodoInput } from "@/types/todo";
 import "./app.css";
 import { listen } from "@tauri-apps/api/event";
 import UpdateChecker from "./components/UpdateChecker";
+import { CopilotTextarea } from "@copilotkit/react-textarea";
+import FancyEmailComposer from "./components/FancyEmailComposer";
+
+function removeDynamicStyles() {
+  // Find the style element by its ID
+  const styleElement = document.getElementById("dynamic-styles");
+
+  // Check if the element exists
+  if (styleElement) {
+    // Remove the element from the DOM
+    styleElement.remove();
+    console.log("Dynamic styles element removed successfully");
+    return true;
+  } else {
+    console.log("Dynamic styles element not found");
+    return false;
+  }
+}
 
 function App() {
   const [user, setUser] = useState<SupabaseUser | null>(null);
@@ -39,7 +57,7 @@ function App() {
   const [loginError, setLoginError] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
   const [showUpdateChecker, setShowUpdateChecker] = useState(false);
-
+  const [text, setText] = useState("");
   // Todo states
   const [todos, setTodos] = useState<Todo[]>([]);
   const [todosLoading, setTodosLoading] = useState(false);
@@ -111,6 +129,10 @@ function App() {
       loadTodos();
     }
   }, [user]);
+
+  useEffect(() => {
+    removeDynamicStyles();
+  }, []);
 
   const loadTodos = async () => {
     setTodosLoading(true);
@@ -501,7 +523,14 @@ function App() {
             </CardHeader>
             <CardContent>
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid w-full grid-cols-5">
+                  <TabsTrigger
+                    value="copilotkit"
+                    className="flex items-center space-x-2"
+                  >
+                    <CheckSquare className="w-4 h-4" />
+                    <span>CopilotKit</span>
+                  </TabsTrigger>
                   <TabsTrigger
                     value="all"
                     className="flex items-center space-x-2"
@@ -532,43 +561,47 @@ function App() {
                   </TabsTrigger>
                 </TabsList>
 
-                <div className="mt-6">
-                  {todosLoading ? (
-                    <div className="flex justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin" />
-                    </div>
-                  ) : filteredTodos.length === 0 ? (
-                    <div className="text-center py-12">
-                      <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <ListTodo className="w-10 h-10 text-gray-400" />
+                {activeTab === "copilotkit" ? (
+                  <FancyEmailComposer />
+                ) : (
+                  <div className="mt-6">
+                    {todosLoading ? (
+                      <div className="flex justify-center py-8">
+                        <Loader2 className="w-6 h-6 animate-spin" />
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                        {activeTab === "all"
-                          ? "No todos yet"
-                          : `No ${activeTab.replace("_", " ")} todos`}
-                      </h3>
-                      <p className="text-gray-500 mb-6">
-                        {activeTab === "all"
-                          ? "Create your first todo to get started organizing your tasks!"
-                          : `No tasks are currently ${activeTab.replace(
-                              "_",
-                              " "
-                            )}.`}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {filteredTodos.map((todo) => (
-                        <TodoCard
-                          key={todo.id}
-                          todo={todo}
-                          onUpdate={handleUpdateTodo}
-                          onDelete={handleDeleteTodo}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
+                    ) : filteredTodos.length === 0 ? (
+                      <div className="text-center py-12">
+                        <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <ListTodo className="w-10 h-10 text-gray-400" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                          {activeTab === "all"
+                            ? "No todos yet"
+                            : `No ${activeTab.replace("_", " ")} todos`}
+                        </h3>
+                        <p className="text-gray-500 mb-6">
+                          {activeTab === "all"
+                            ? "Create your first todo to get started organizing your tasks!"
+                            : `No tasks are currently ${activeTab.replace(
+                                "_",
+                                " "
+                              )}.`}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filteredTodos.map((todo) => (
+                          <TodoCard
+                            key={todo.id}
+                            todo={todo}
+                            onUpdate={handleUpdateTodo}
+                            onDelete={handleDeleteTodo}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </Tabs>
             </CardContent>
           </Card>

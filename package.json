@@ -10,6 +10,9 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@copilotkit/react-core": "^1.9.1",
+    "@copilotkit/react-textarea": "^1.9.1",
+    "@copilotkit/react-ui": "^1.9.1",
     "@hookform/resolvers": "^5.1.1",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-dialog": "^1.1.14",

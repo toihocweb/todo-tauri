@@ -11,8 +11,8 @@ import {
 } from "lucide-react";
 
 const UpdateChecker = ({ isOpen, onClose }) => {
-  const [updateState, setUpdateState] = useState("idle"); // idle, checking, available, downloading, downloaded, error, noUpdate
-  const [updateInfo, setUpdateInfo] = useState<Update | null>(null);
+  const [updateState, setUpdateState] = useState("idle");
+  const [updateInfo, setUpdateInfo] = useState(null);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [error, setError] = useState("");
   const [totalBytes, setTotalBytes] = useState(0);
@@ -30,11 +30,8 @@ const UpdateChecker = ({ isOpen, onClose }) => {
         setUpdateState("available");
       } else {
         setUpdateState("noUpdate");
-        // Auto close after 2 seconds if no update
         setTimeout(() => {
-          if (updateState === "noUpdate") {
-            onClose();
-          }
+          onClose();
         }, 2000);
       }
     } catch (err) {
@@ -52,17 +49,18 @@ const UpdateChecker = ({ isOpen, onClose }) => {
     setDownloadedBytes(0);
 
     try {
+      let totalDownloaded = 0; // Fix: Use local variable
+
       await updateInfo.downloadAndInstall((event) => {
         switch (event.event) {
           case "Started":
             setTotalBytes(event.data.contentLength || 0);
             break;
           case "Progress":
-            const newDownloaded =
-              downloadedBytes + (event.data.chunkLength || 0);
-            setDownloadedBytes(newDownloaded);
+            totalDownloaded += event.data.chunkLength || 0; // Fix: Accumulate properly
+            setDownloadedBytes(totalDownloaded);
             if (totalBytes > 0) {
-              setDownloadProgress((newDownloaded / totalBytes) * 100);
+              setDownloadProgress((totalDownloaded / totalBytes) * 100);
             }
             break;
           case "Finished":
@@ -72,7 +70,6 @@ const UpdateChecker = ({ isOpen, onClose }) => {
         }
       });
 
-      // Auto relaunch after download
       setTimeout(async () => {
         await relaunch();
       }, 1000);
@@ -83,14 +80,12 @@ const UpdateChecker = ({ isOpen, onClose }) => {
     }
   };
 
-  // Auto check when dialog opens
   useEffect(() => {
     if (isOpen && updateState === "idle") {
       checkForUpdates();
     }
-  }, [isOpen]);
+  }, [isOpen, updateState]); // Fix: Add dependencies
 
-  // Reset state when dialog closes
   useEffect(() => {
     if (!isOpen) {
       setUpdateState("idle");
@@ -190,7 +185,9 @@ const UpdateChecker = ({ isOpen, onClose }) => {
                     Release Date:
                   </span>
                   <span className="text-sm text-gray-800">
-                    {new Date(updateInfo.date).toLocaleDateString()}
+                    {updateInfo.date
+                      ? new Date(updateInfo.date).toLocaleDateString()
+                      : "Unknown"}
                   </span>
                 </div>
               </div>

@@ -16,6 +16,18 @@ if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then
   exit 1
 fi
 
+# Remove 'v' prefix from version
+VERSION_NUMBER=${VERSION#v}
+
+echo "Updating version to $VERSION_NUMBER..."
+
+# Update version in tauri.conf.json
+jq --arg version "$VERSION_NUMBER" '.version = $version' src-tauri/tauri.conf.json > tmp.json && mv tmp.json src-tauri/tauri.conf.json
+
+# Update version in Cargo.toml
+sed -i.bak "s/^version = \".*\"/version = \"$VERSION_NUMBER\"/" src-tauri/Cargo.toml
+rm src-tauri/Cargo.toml.bak
+
 echo "Building version $VERSION..."
 
 # Build the app (this will create signed artifacts)
@@ -102,7 +114,7 @@ PLATFORMS_JSON=""
 if [ -n "$MACOS_APP_TAR" ] && [ -n "$MACOS_SIGNATURE" ]; then
   PLATFORMS_JSON="$PLATFORMS_JSON    \"darwin-aarch64\": {
       \"signature\": \"$MACOS_SIGNATURE\",
-      \"url\": \"https://github.com/$REPO/releases/download/$VERSION/$(basename $MACOS_APP_TAR)\"
+      \"url\": \"https://github.com/$REPO/releases/download/$VERSION/$(basename "$MACOS_APP_TAR")\"
     }"
 fi
 
@@ -110,7 +122,7 @@ if [ -n "$LINUX_APPIMAGE" ] && [ -n "$LINUX_SIGNATURE" ]; then
   [ -n "$PLATFORMS_JSON" ] && PLATFORMS_JSON="$PLATFORMS_JSON,"
   PLATFORMS_JSON="$PLATFORMS_JSON    \"linux-x86_64\": {
       \"signature\": \"$LINUX_SIGNATURE\",
-      \"url\": \"https://github.com/$REPO/releases/download/$VERSION/$(basename $LINUX_APPIMAGE)\"
+      \"url\": \"https://github.com/$REPO/releases/download/$VERSION/$(basename "$LINUX_APPIMAGE")\"
     }"
 fi
 
@@ -118,7 +130,7 @@ if [ -n "$WINDOWS_EXE" ] && [ -n "$WINDOWS_SIGNATURE" ]; then
   [ -n "$PLATFORMS_JSON" ] && PLATFORMS_JSON="$PLATFORMS_JSON,"
   PLATFORMS_JSON="$PLATFORMS_JSON    \"windows-x86_64\": {
       \"signature\": \"$WINDOWS_SIGNATURE\",
-      \"url\": \"https://github.com/$REPO/releases/download/$VERSION/$(basename $WINDOWS_EXE)\"
+      \"url\": \"https://github.com/$REPO/releases/download/$VERSION/$(basename "$WINDOWS_EXE")\"
     }"
 fi
 
